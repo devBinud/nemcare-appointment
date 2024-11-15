@@ -1,77 +1,107 @@
-.appointment-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(to right, #76c7c0, #d4f1f4);
-    padding: 20px;
+/* Appointment.css */
+
+/* Scoped class for the appointment form */
+.appointmentBooking__form {
+  display: flex;
+  justify-content: center;  /* Centers the form horizontally */
+  align-items: center;      /* Centers the form vertically */
+  min-height: 80vh;        /* Full height for the form */
+  padding: 20px;
+  box-sizing: border-box;   /* Prevents the padding from breaking the layout */
+}
+
+/* Container for the form and image side by side */
+.appointmentBooking__container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;  /* Full width of the parent container */
+  max-width: 800px;  /* Max width for larger screens */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Box shadow for the container */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #fff; /* White background */
+  overflow: hidden; /* Prevents overflow from breaking layout */
+}
+
+/* Right side with the form */
+.appointmentBooking__formContainer {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%; /* Ensures the form takes up the remaining space */
+  box-sizing: border-box;
+}
+
+.appointmentBooking__heading {
+  font-size: 28px;
+  margin-bottom: 26px;
+  color: #333;
+}
+
+/* Styling the form */
+.appointmentBooking__formStyle {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Space between fields */
+}
+
+/* Input field and select box styling */
+.appointmentBooking__input,
+.appointmentBooking__select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;  /* Ensure padding doesn't affect width */
+}
+
+/* Button styling */
+.appointmentBooking__button {
+  padding: 12px;
+  background-color: #960c0c;  /* Green button */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight:600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;  /* Make button full-width */
+}
+
+.appointmentBooking__button:hover {
+  background-color: #04152b;  /* Darker green on hover */
+}
+
+/* Label styling */
+.appointmentBooking__label {
+  font-weight: bold;
+  color: #333;
+}
+
+
+
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .appointmentBooking__container {
+    flex-direction: column;  /* Stack the form and image on small screens */
+    width: 100%; /* Adjust the width on smaller screens */
   }
-  
-  .appointment-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    max-width: 500px;
-    width: 100%;
+  .appointmentBooking__form {
+    padding: 0px;
   }
-  
-  .appointment-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    text-align: center;
-    margin-bottom: 10px;
+  .appointmentBooking__formContainer {
+    padding: 20px;  
   }
-  
-  .appointment-subtitle {
-    font-size: 14px;
-    color: #555;
-    text-align: center;
-    margin-bottom: 20px;
+  .appointmentBooking__image,
+  .appointmentBooking__formContainer {
+    width: 100%; /* Make columns full width on smaller screens */
   }
-  
-  .appointment-form .form-group {
-    margin-bottom: 15px;
+
+  .appointmentBooking__image {
+    display:none
   }
-  
-  .appointment-form label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 5px;
-  }
-  
-  .appointment-form .form-control {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .appointment-form .form-control:focus {
-    outline: none;
-    border-color: #76c7c0;
-    box-shadow: 0 0 4px rgba(118, 199, 192, 0.5);
-  }
-  
-  .btn-submit {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #76c7c0;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-submit:hover {
-    background-color: #5ba9a2;
-  }
-  
+}

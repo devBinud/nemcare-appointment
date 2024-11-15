@@ -1,0 +1,36 @@
+/* Footer Styles */
+.footer {
+    background-color: #013340;  /* Dark color for footer */
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .footer a {
+    color: #FFD700;  /* Gold color for links */
+    text-decoration: none;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  
+  .footer-links {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+  
+  .footer-links span {
+    cursor: pointer;
+  }
+  
+  .footer-links span:hover {
+    color: #FFD700;
+  }
+  

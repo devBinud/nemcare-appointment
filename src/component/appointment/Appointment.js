@@ -1,149 +1,166 @@
-import React, { useState } from 'react';
-import './Appointment.css';
+import React, { useState } from "react";
+import sendAppointmentData from "./firebase"; // Import the function to send data
+import "./Appointment.css"; // Import the CSS file
 
-function Appointment() {
-  const [formData, setFormData] = useState({
-    specialization: '',
-    doctor: '',
-    name: '',
-    email: '',
-    phone: '',
-    appointmentDate: '',
-    appointmentTime: '',
-    reason: '',
-  });
+const Appointment = () => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [department, setDepartment] = useState("");
+  const [doctor, setDoctor] = useState("");
+  const [date, setDate] = useState("");
+  const [timeSlot, setTimeSlot] = useState("");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // Departments and their respective doctors
+  const departments = {
+    Cardiology: ["Dr. John", "Dr. Sarah", "Dr. Emily"],
+    Neurology: ["Dr. Robert", "Dr. Jane", "Dr. Steve"],
+    Pediatrics: ["Dr. Alice", "Dr. Thomas", "Dr. Nancy"],
+    Orthopedics: ["Dr. David", "Dr. Sophie", "Dr. Paul"],
+  };
+
+  // Predefined time slots
+  const timeSlots = ["5:00 - 5:30", "5:30 - 6:00", "6:00 - 6:30", "6:30 - 7:00"];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Prepare appointment data
+    const appointmentData = {
+      name,
+      phone,
+      email: email || null, // Make email optional
+      department,
+      doctor,
+      date,
+      timeSlot,
+    };
+
+    // Send appointment data to Firebase
+    sendAppointmentData(appointmentData);
+
+    // Clear the form after submission
+    setName("");
+    setPhone("");
+    setEmail("");
+    setDepartment("");
+    setDoctor("");
+    setDate("");
+    setTimeSlot("");
+
+    alert("Appointment successfully submitted!");
   };
 
   return (
-    <div className="appointment-container">
-      <div className="appointment-card">
-        <h2 className="appointment-title">Book Your Appointment</h2>
-        <form
-          name="appointment" // Name of the form
-          method="POST"
-          data-netlify="true" // Enable Netlify Forms
-          netlify-honeypot="bot-field" // Add spam protection
-        >
-          {/* Hidden field required by Netlify */}
-          <input type="hidden" name="form-name" value="appointment" />
-
-          <div hidden>
-            <label>
-              Don’t fill this out:{' '}
-              <input name="bot-field" onChange={handleChange} />
-            </label>
-          </div>
-
-          <div className="form-group">
-            <label>Specialization</label>
-            <select
-              name="specialization"
-              className="form-control"
-              onChange={handleChange}
-              required
-            >
-              <option value="" disabled>
-                Select Specialization
-              </option>
-              <option value="Cardiology">Cardiology</option>
-              <option value="Dermatology">Dermatology</option>
-              <option value="Pediatrics">Pediatrics</option>
-              <option value="Orthopedics">Orthopedics</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Doctor</label>
-            <select
-              name="doctor"
-              className="form-control"
-              onChange={handleChange}
-              required
-            >
-              <option value="" disabled>
-                Select Doctor
-              </option>
-              <option value="Dr. John Smith">Dr. John Smith</option>
-              <option value="Dr. Emily Carter">Dr. Emily Carter</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Name</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Phone</label>
-            <input
-              type="tel"
-              name="phone"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Appointment Date</label>
-            <input
-              type="date"
-              name="appointmentDate"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Appointment Time</label>
-            <input
-              type="time"
-              name="appointmentTime"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Reason for Visit</label>
-            <textarea
-              name="reason"
-              className="form-control"
-              onChange={handleChange}
-              required
-            ></textarea>
-          </div>
-
-          <button type="submit" className="btn-submit">
-            Submit
-          </button>
-        </form>
+    <div className="appointmentBooking__form">
+      <div className="appointmentBooking__container">
+        {/* Right Column with Form */}
+        <div className="appointmentBooking__formContainer">
+          <h2 className="appointmentBooking__heading">Book an Appointment</h2>
+          <form className="appointmentBooking__formStyle" onSubmit={handleSubmit}>
+            <div>
+              <label className="appointmentBooking__label">Name</label>
+              <input
+                className="appointmentBooking__input"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="appointmentBooking__label">Phone</label>
+              <input
+                className="appointmentBooking__input"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="appointmentBooking__label">Email (Optional)</label>
+              <input
+                className="appointmentBooking__input"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="appointmentBooking__label">Department</label>
+              <select
+                className="appointmentBooking__select"
+                value={department}
+                onChange={(e) => {
+                  setDepartment(e.target.value);
+                  setDoctor(""); // Reset doctor when department changes
+                }}
+                required
+              >
+                <option value="">Select Department</option>
+                {Object.keys(departments).map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="appointmentBooking__label">Doctor</label>
+              <select
+                className="appointmentBooking__select"
+                value={doctor}
+                onChange={(e) => setDoctor(e.target.value)}
+                required
+                disabled={!department} // Disable if no department selected
+              >
+                <option value="">Select Doctor</option>
+                {department &&
+                  departments[department].map((doc) => (
+                    <option key={doc} value={doc}>
+                      {doc}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div>
+              <label className="appointmentBooking__label">Date</label>
+              <input
+                className="appointmentBooking__input"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="appointmentBooking__label">Time Slot</label>
+              <div className="appointmentBooking__timeSlots">
+                {timeSlots.map((slot) => (
+                  <div key={slot}>
+                    <input
+                      type="radio"
+                      id={slot}
+                      name="timeSlot"
+                      value={slot}
+                      checked={timeSlot === slot}
+                      onChange={(e) => setTimeSlot(e.target.value)}
+                      required
+                    />
+                    <label htmlFor={slot}>{slot}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button className="appointmentBooking__button" type="submit">
+              Submit Appointment
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Appointment;

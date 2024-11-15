@@ -1,0 +1,36 @@
+.navbar{
+  padding: 10px 40px; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow at the bottom */
+}
+
+.navbar-logo {
+  height: 50px; /* Adjust as needed */
+  width: auto;  /* Maintain aspect ratio */
+  display: inline-block;
+}
+.adminLogin__button{
+  background-color: #960c0c;
+  padding: 11px 20px;
+  text-decoration: none;
+  color: white;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.adminLogin__button:hover{
+  background-color: #04152b;
+  padding: 11px 20px;
+  text-decoration: none;
+  color: white;
+  border-radius: 10px;
+  font-weight: 600;
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar{
+    padding: 10px 0px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow at the bottom */
+  }
+  .navbar-logo {
+  height: 40px; /* Adjust as needed */
+}
+}

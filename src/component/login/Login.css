@@ -1,0 +1,100 @@
+/* Container for the login form */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 79.4vh;
+    background-color: #242632;
+  }
+  
+  /* Login form styling */
+  .login-form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    width: 450px;
+  }
+  
+  /* Heading styling */
+  .login-heading {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* Input container styling */
+  .login-input-container {
+    margin-bottom: 15px;
+  }
+  
+  /* Label styling */
+  .login-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  /* Input field styling */
+  .login-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  
+  /* Button styling */
+  .login-button {
+    width: 100%;
+    padding: 11px 20px;
+    background-color: #960c0c;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-button:hover {
+    background-color: #04152b;
+  }
+  
+  /* Container for the password input and toggle button */
+.password-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  /* Button to toggle password visibility */
+  .toggle-password {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 14px;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0;
+  }
+  
+  .toggle-password:hover {
+    text-decoration: underline;
+  }
+
+
+  @media (max-width: 768px) {
+  .login-form {
+    margin-left:14px;
+    margin-right:8px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    width: 450px;
+  }
+}
