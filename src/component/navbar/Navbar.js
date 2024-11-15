@@ -19,8 +19,8 @@ function Navbar() {
         
       </ul>
       <form class="d-flex">
-        <a href='/login' class="adminLogin__button" type="submit">
-        Admin Login</a>
+        <Link to='/login' class="adminLogin__button" type="submit">
+        Admin Login</Link>
       </form>
     </div>
   </div>
