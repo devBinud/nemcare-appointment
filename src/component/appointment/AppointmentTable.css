@@ -1,0 +1,39 @@
+.filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .filters .form-select {
+    width: auto;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .bi-whatsapp {
+    font-size: 1.2rem;
+  }
+  table {
+    word-wrap: break-word;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .table th, .table td {
+      font-size: 12px;
+    }
+  }

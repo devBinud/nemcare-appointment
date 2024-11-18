@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import sendAppointmentData from "./firebase"; // Import the function to send data
 import "./Appointment.css"; // Import the CSS file
+import doctorsAPI from "./doctorsAPI"; // Import the doctors and schedule data
 
 const Appointment = () => {
   const [name, setName] = useState("");
@@ -10,31 +11,42 @@ const Appointment = () => {
   const [doctor, setDoctor] = useState("");
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
+  const [isWhatsappAvailable, setIsWhatsappAvailable] = useState("");
 
-  // Departments and their respective doctors
-  const departments = {
-    Cardiology: ["Dr. John", "Dr. Sarah", "Dr. Emily"],
-    Neurology: ["Dr. Robert", "Dr. Jane", "Dr. Steve"],
-    Pediatrics: ["Dr. Alice", "Dr. Thomas", "Dr. Nancy"],
-    Orthopedics: ["Dr. David", "Dr. Sophie", "Dr. Paul"],
+  // Dynamically fetch time slots based on the selected department and doctor
+  const timeSlots =
+    department && doctor ? doctorsAPI[department][doctor] || [] : [];
+
+  // Handle phone input validation
+  const handlePhoneChange = (e) => {
+    const input = e.target.value;
+    if (/^\d{0,10}$/.test(input)) {
+      setPhone(input);
+    }
   };
-
-  // Predefined time slots
-  const timeSlots = ["5:00 - 5:30", "5:30 - 6:00", "6:00 - 6:30", "6:30 - 7:00"];
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (phone.length < 10) {
+      alert("Phone number must be exactly 10 digits.");
+      return;
+    }
 
     // Prepare appointment data
     const appointmentData = {
       name,
       phone,
-      email: email || null, // Make email optional
+      email: email || null, // Email is optional
       department,
       doctor,
       date,
       timeSlot,
+      isWhatsappAvailable,
     };
+
+    // Log all form data in the console
+    console.log("Submitted Appointment Data:", appointmentData);
 
     // Send appointment data to Firebase
     sendAppointmentData(appointmentData);
@@ -54,10 +66,12 @@ const Appointment = () => {
   return (
     <div className="appointmentBooking__form">
       <div className="appointmentBooking__container">
-        {/* Right Column with Form */}
         <div className="appointmentBooking__formContainer">
           <h2 className="appointmentBooking__heading">Book an Appointment</h2>
-          <form className="appointmentBooking__formStyle" onSubmit={handleSubmit}>
+          <form
+            className="appointmentBooking__formStyle"
+            onSubmit={handleSubmit}
+          >
             <div>
               <label className="appointmentBooking__label">Name</label>
               <input
@@ -74,9 +88,38 @@ const Appointment = () => {
                 className="appointmentBooking__input"
                 type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={handlePhoneChange}
                 required
+                placeholder="Enter 10-digit phone number"
               />
+            </div>
+            <div>
+              <label className="appointmentBooking__label">
+                Is WhatsApp available on this number?
+              </label>
+              <div className="appointmentBooking__radioGroup mt-2">
+                <label className="me-3">
+                  <input
+                    type="radio"
+                    className="me-1"
+                    name="isWhatsappAvailable"
+                    value="yes"
+                    
+                    onChange={(e) => setIsWhatsappAvailable(e.target.value)}
+                  />
+                  Yes
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="isWhatsappAvailable"
+                    className="me-1"
+                    value="no"
+                    onChange={(e) => setIsWhatsappAvailable(e.target.value)}
+                  />
+                  No
+                </label>
+              </div>
             </div>
             <div>
               <label className="appointmentBooking__label">Email (Optional)</label>
@@ -99,7 +142,7 @@ const Appointment = () => {
                 required
               >
                 <option value="">Select Department</option>
-                {Object.keys(departments).map((dept) => (
+                {Object.keys(doctorsAPI).map((dept) => (
                   <option key={dept} value={dept}>
                     {dept}
                   </option>
@@ -113,11 +156,11 @@ const Appointment = () => {
                 value={doctor}
                 onChange={(e) => setDoctor(e.target.value)}
                 required
-                disabled={!department} // Disable if no department selected
+                disabled={!department}
               >
                 <option value="">Select Doctor</option>
                 {department &&
-                  departments[department].map((doc) => (
+                  Object.keys(doctorsAPI[department]).map((doc) => (
                     <option key={doc} value={doc}>
                       {doc}
                     </option>
@@ -135,23 +178,27 @@ const Appointment = () => {
               />
             </div>
             <div>
-              <label className="appointmentBooking__label">Time Slot</label>
-              <div className="appointmentBooking__timeSlots">
-                {timeSlots.map((slot) => (
-                  <div key={slot}>
-                    <input
-                      type="radio"
-                      id={slot}
-                      name="timeSlot"
-                      value={slot}
-                      checked={timeSlot === slot}
-                      onChange={(e) => setTimeSlot(e.target.value)}
-                      required
-                    />
-                    <label htmlFor={slot}>{slot}</label>
+              {doctor && ( // Conditionally render only if a doctor is selected
+                <>
+                  <label className="appointmentBooking__label">Time Slot</label>
+                  <div className="appointmentBooking__timeSlots">
+                    {timeSlots.map((slot) => (
+                      <div key={slot}>
+                        <input
+                          type="radio"
+                          id={slot}
+                          name="timeSlot"
+                          value={slot}
+                          checked={timeSlot === slot}
+                          onChange={(e) => setTimeSlot(e.target.value)}
+                          required
+                        />
+                        <label htmlFor={slot}>{slot}</label>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
             <button className="appointmentBooking__button" type="submit">
               Submit Appointment
