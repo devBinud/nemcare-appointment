@@ -104,4 +104,13 @@
   .appointmentBooking__image {
     display:none
   }
+
+  .css-1yvlll1 {
+    background: #fff;
+    border-radius: 8px;
+    padding: 5px!important;
+    margin: 20px 0;
+    box-shadow: none!important;
+}
+  
 }

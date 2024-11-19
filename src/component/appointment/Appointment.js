@@ -1,7 +1,19 @@
 import React, { useState } from "react";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import CircularProgress from "@mui/material/CircularProgress";
+import Fade from "@mui/material/Fade";
 import sendAppointmentData from "./firebase"; // Import the function to send data
 import "./Appointment.css"; // Import the CSS file
 import doctorsAPI from "./doctorsAPI"; // Import the doctors and schedule data
+import doctorImage from "../../assets/1.jpg"
 
 const Appointment = () => {
   const [name, setName] = useState("");
@@ -12,12 +24,12 @@ const Appointment = () => {
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [isWhatsappAvailable, setIsWhatsappAvailable] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Modal state
 
-  // Dynamically fetch time slots based on the selected department and doctor
   const timeSlots =
     department && doctor ? doctorsAPI[department][doctor] || [] : [];
 
-  // Handle phone input validation
   const handlePhoneChange = (e) => {
     const input = e.target.value;
     if (/^\d{0,10}$/.test(input)) {
@@ -25,7 +37,7 @@ const Appointment = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (phone.length < 10) {
@@ -33,11 +45,12 @@ const Appointment = () => {
       return;
     }
 
-    // Prepare appointment data
+    setIsSubmitting(true);
+
     const appointmentData = {
       name,
       phone,
-      email: email || null, // Email is optional
+      email: email || null,
       department,
       doctor,
       date,
@@ -45,13 +58,24 @@ const Appointment = () => {
       isWhatsappAvailable,
     };
 
-    // Log all form data in the console
-    console.log("Submitted Appointment Data:", appointmentData);
+    try {
+      // Simulate sending data with a delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await sendAppointmentData(appointmentData);
+      setIsSubmitting(false);
 
-    // Send appointment data to Firebase
-    sendAppointmentData(appointmentData);
+      // Animate and show success modal
+      setTimeout(() => {
+        setIsSuccessModalOpen(true);
+      }, 300); // Slight delay for smooth transition
+      resetForm();
+    } catch (error) {
+      setIsSubmitting(false);
+      alert("Something went wrong. Please try again.");
+    }
+  };
 
-    // Clear the form after submission
+  const resetForm = () => {
     setName("");
     setPhone("");
     setEmail("");
@@ -59,153 +83,199 @@ const Appointment = () => {
     setDoctor("");
     setDate("");
     setTimeSlot("");
-
-    alert("Appointment successfully submitted!");
+    setIsWhatsappAvailable("");
   };
 
   return (
-    <div className="appointmentBooking__form">
-      <div className="appointmentBooking__container">
-        <div className="appointmentBooking__formContainer">
-          <h2 className="appointmentBooking__heading">Book an Appointment</h2>
-          <form
-            className="appointmentBooking__formStyle"
+    <div className="container">
+      <div className="row align-items-center">
+        {/* Left Side */}
+        <div className="col-lg-6 text-center d-none d-lg-block">
+          <img
+            src={doctorImage}
+            alt="Doctor Consultation"
+            className="img-fluid"
+            style={{ maxHeight: "400px", marginBottom: "20px" }}
+          />
+          <Typography variant="h5" gutterBottom>
+            Book Your Appointment Easily!
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            Get quick and easy access to the best doctors in their field.
+            Schedule your appointment now for a hassle-free experience.
+          </Typography>
+        </div>
+
+        {/* Right Side */}
+        <div className="col-lg-6">
+          <Box
+            component="form"
             onSubmit={handleSubmit}
+            sx={{
+              background: "#fff",
+              borderRadius: 2,
+              padding: 4,
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+            }}
           >
-            <div>
-              <label className="appointmentBooking__label">Name</label>
-              <input
-                className="appointmentBooking__input"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="appointmentBooking__label">Phone</label>
-              <input
-                className="appointmentBooking__input"
-                type="tel"
-                value={phone}
-                onChange={handlePhoneChange}
-                required
-                placeholder="Enter 10-digit phone number"
-              />
-            </div>
-            <div>
-              <label className="appointmentBooking__label">
-                Is WhatsApp available on this number?
-              </label>
-              <div className="appointmentBooking__radioGroup mt-2">
-                <label className="me-3">
-                  <input
-                    type="radio"
-                    className="me-1"
-                    name="isWhatsappAvailable"
-                    value="yes"
-                    
-                    onChange={(e) => setIsWhatsappAvailable(e.target.value)}
-                  />
-                  Yes
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="isWhatsappAvailable"
-                    className="me-1"
-                    value="no"
-                    onChange={(e) => setIsWhatsappAvailable(e.target.value)}
-                  />
-                  No
-                </label>
-              </div>
-            </div>
-            <div>
-              <label className="appointmentBooking__label">Email (Optional)</label>
-              <input
-                className="appointmentBooking__input"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="appointmentBooking__label">Department</label>
-              <select
-                className="appointmentBooking__select"
-                value={department}
-                onChange={(e) => {
-                  setDepartment(e.target.value);
-                  setDoctor(""); // Reset doctor when department changes
-                }}
-                required
-              >
-                <option value="">Select Department</option>
-                {Object.keys(doctorsAPI).map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
+            <Typography variant="h6" mb={2}>
+              Book an Appointment
+            </Typography>
+            <TextField
+              id="name"
+              label="Name"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            <TextField
+              id="phone"
+              label="Phone Number"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              type="number"
+              value={phone}
+              onChange={handlePhoneChange}
+              required
+            />
+            <TextField
+              id="email"
+              label="Email (optional)"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextField
+              id="department"
+              select
+              label="Department"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={department}
+              onChange={(e) => {
+                setDepartment(e.target.value);
+                setDoctor("");
+              }}
+              required
+            >
+              {Object.keys(doctorsAPI).map((dept) => (
+                <MenuItem key={dept} value={dept}>
+                  {dept}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              id="doctor"
+              select
+              label="Doctor"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={doctor}
+              onChange={(e) => setDoctor(e.target.value)}
+              disabled={!department}
+              required
+            >
+              {department &&
+                Object.keys(doctorsAPI[department]).map((doc) => (
+                  <MenuItem key={doc} value={doc}>
+                    {doc}
+                  </MenuItem>
                 ))}
-              </select>
-            </div>
-            <div>
-              <label className="appointmentBooking__label">Doctor</label>
-              <select
-                className="appointmentBooking__select"
-                value={doctor}
-                onChange={(e) => setDoctor(e.target.value)}
-                required
-                disabled={!department}
-              >
-                <option value="">Select Doctor</option>
-                {department &&
-                  Object.keys(doctorsAPI[department]).map((doc) => (
-                    <option key={doc} value={doc}>
-                      {doc}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div>
-              <label className="appointmentBooking__label">Date</label>
-              <input
-                className="appointmentBooking__input"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              {doctor && ( // Conditionally render only if a doctor is selected
-                <>
-                  <label className="appointmentBooking__label">Time Slot</label>
-                  <div className="appointmentBooking__timeSlots">
-                    {timeSlots.map((slot) => (
-                      <div key={slot}>
-                        <input
-                          type="radio"
-                          id={slot}
-                          name="timeSlot"
-                          value={slot}
-                          checked={timeSlot === slot}
-                          onChange={(e) => setTimeSlot(e.target.value)}
-                          required
-                        />
-                        <label htmlFor={slot}>{slot}</label>
-                      </div>
-                    ))}
-                  </div>
-                </>
+            </TextField>
+            <TextField
+              id="date"
+              label="Date"
+              type="date"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              fullWidth
+              margin="normal"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+            {doctor && (
+              <Box mt={2}>
+                <Typography variant="body2" mb={1}>
+                  Select a Time Slot
+                </Typography>
+                {timeSlots.map((slot) => (
+                  <Button
+                    key={slot}
+                    variant={timeSlot === slot ? "contained" : "outlined"}
+                    sx={{ margin: "5px" }}
+                    onClick={() => setTimeSlot(slot)}
+                  >
+                    {slot}
+                  </Button>
+                ))}
+              </Box>
+            )}
+            <Box mt={2}>
+              <Typography variant="body2" mb={1}>
+                Is WhatsApp available on this number?
+              </Typography>
+              <div>
+                <Button
+                  variant={isWhatsappAvailable === "yes" ? "contained" : "outlined"}
+                  sx={{ marginRight: "10px" }}
+                  onClick={() => setIsWhatsappAvailable("yes")}
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant={isWhatsappAvailable === "no" ? "contained" : "outlined"}
+                  onClick={() => setIsWhatsappAvailable("no")}
+                >
+                  No
+                </Button>
+              </div>
+            </Box>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ marginTop: 3 }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Submit Appointment"
               )}
-            </div>
-            <button className="appointmentBooking__button" type="submit">
-              Submit Appointment
-            </button>
-          </form>
+            </Button>
+          </Box>
         </div>
       </div>
+
+      {/* Success Modal with Animation */}
+      <Dialog
+        open={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        TransitionComponent={Fade}
+        transitionDuration={{ enter: 500, exit: 300 }}
+      >
+        <DialogTitle>Success!</DialogTitle>
+        <DialogContent>
+          <Typography>Your appointment has been successfully submitted.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsSuccessModalOpen(false)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

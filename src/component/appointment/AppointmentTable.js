@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 import { FaFilter, FaWhatsapp, FaDownload } from "react-icons/fa"; // Import icons
 import { jsPDF } from "jspdf"; // Import jsPDF
 import "jspdf-autotable"; // Import jsPDF autotable plugin
+import * as XLSX from "xlsx"; // Import XLSX for Excel export
 
 // Firebase configuration
 const firebaseConfig = {
@@ -23,13 +24,16 @@ const database = getDatabase(app);
 function AppointmentTable() {
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
-  const [departments, setDepartments] = useState([]); // Departments list
-  const [doctors, setDoctors] = useState([]); // Doctors list
-  const [timeSlots, setTimeSlots] = useState([]); // Time slots list
+  const [departments, setDepartments] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Fetch appointments from Firebase
   const fetchAppointments = async () => {
@@ -46,7 +50,6 @@ function AppointmentTable() {
       setAppointments(appointmentsList);
       setFilteredAppointments(appointmentsList);
 
-      // Extract unique departments, doctors, and time slots
       const departmentsList = [...new Set(appointmentsList.map((appt) => appt.department))];
       setDepartments(departmentsList);
     }
@@ -59,9 +62,9 @@ function AppointmentTable() {
     const filteredDoctors = appointments
       .filter((appt) => appt.department === department)
       .map((appt) => appt.doctor);
-    setDoctors([...new Set(filteredDoctors)]); // Unique doctors
-    setSelectedDoctor(""); // Reset doctor
-    setTimeSlots([]); // Reset time slots
+    setDoctors([...new Set(filteredDoctors)]);
+    setSelectedDoctor("");
+    setTimeSlots([]);
   };
 
   // Handle doctor selection and update time slots dropdown
@@ -70,8 +73,8 @@ function AppointmentTable() {
     const filteredSlots = appointments
       .filter((appt) => appt.doctor === doctor)
       .map((appt) => appt.timeSlot);
-    setTimeSlots([...new Set(filteredSlots)]); // Unique time slots
-    setSelectedTimeSlot(""); // Reset time slot
+    setTimeSlots([...new Set(filteredSlots)]);
+    setSelectedTimeSlot("");
   };
 
   // Filter appointments
@@ -88,6 +91,7 @@ function AppointmentTable() {
       filtered = filtered.filter((appt) => appt.timeSlot === selectedTimeSlot);
     }
     setFilteredAppointments(filtered);
+    setCurrentPage(1); // Reset to first page
   };
 
   // Export filtered data to PDF
@@ -108,18 +112,57 @@ function AppointmentTable() {
     doc.save(`appointments_${new Date().toISOString()}.pdf`);
   };
 
+  // Export filtered data to Excel
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(
+      filteredAppointments.map((appt, index) => ({
+        "Sl. No.": index + 1,
+        "Patient Name": appt.name,
+        "Doctor": appt.doctor,
+        "Department": appt.department,
+        "Date": appt.date,
+        "Time Slot": appt.timeSlot,
+      }))
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Appointments");
+    XLSX.writeFile(wb, `appointments_${new Date().toISOString()}.xlsx`);
+  };
+
   useEffect(() => {
     fetchAppointments();
   }, []);
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
+  const paginatedAppointments = filteredAppointments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const changePage = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="container py-5">
-      <h3 className="mb-5">Appointments</h3>
+    <div className="container py-3">
+      <h3 className="mb-3">Appointments</h3>
+
+      {/* Filter and Export Buttons */}
+      <div className="mb-3">
+        <button className="btn btn-primary me-3" onClick={exportToExcel}>
+          <FaFilter /> Export to Excel
+        </button>
+        <button className="btn btn-success" onClick={exportToPDF}>
+          <FaDownload /> Export to PDF
+        </button>
+      </div>
 
       {/* Filter Dropdowns */}
       <div className="row mb-4">
-        <div className="col-md-4">
-          <label>Department</label>
+        {/* Department */}
+        <div className="col-md-4 my-1">
+          <label className="my-1">Department</label>
           <select
             className="form-control"
             value={selectedDepartment}
@@ -133,9 +176,9 @@ function AppointmentTable() {
             ))}
           </select>
         </div>
-
-        <div className="col-md-4">
-          <label>Doctor</label>
+        {/* Doctor */}
+        <div className="col-md-3 my-1">
+          <label className="my-1">Doctor</label>
           <select
             className="form-control"
             value={selectedDoctor}
@@ -150,9 +193,9 @@ function AppointmentTable() {
             ))}
           </select>
         </div>
-
-        <div className="col-md-4">
-          <label>Time Slot</label>
+        {/* Time Slot */}
+        <div className="col-md-3 my-1">
+          <label className="my-1">Time Slot</label>
           <select
             className="form-control"
             value={selectedTimeSlot}
@@ -167,60 +210,89 @@ function AppointmentTable() {
             ))}
           </select>
         </div>
-      </div>
-
-      {/* Filter and Export Buttons */}
-      <div className="mb-3">
-        <button className="btn btn-primary me-3" onClick={applyFilters}>
+         {/* Time Slot */}
+         <div className="col-md-2">
+         <button className="btn btn-primary me-3 " onClick={applyFilters}>
           <FaFilter /> Apply Filters
         </button>
-        <button className="btn btn-success" onClick={exportToPDF}>
-          <FaDownload /> Export to PDF
-        </button>
+        </div>
       </div>
 
-      {/* Responsive Table */}
+      {/* Table */}
       {isLoading ? (
         <p>Loading...</p>
-      ) : filteredAppointments.length === 0 ? (
+      ) : paginatedAppointments.length === 0 ? (
         <p>No appointments found</p>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-bordered table-striped">
-            <thead className="thead-dark">
-              <tr>
-                <th>Sl. No.</th>
-                <th>Patient Name</th>
-                <th>Doctor</th>
-                <th>Department</th>
-                <th>Date</th>
-                <th>Time Slot</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredAppointments.map((appt, index) => (
-                <tr key={appt.id}>
-                  <td>{index + 1}</td>
-                  <td>{appt.name}</td>
-                  <td>{appt.doctor}</td>
-                  <td>{appt.department}</td>
-                  <td>{appt.date}</td>
-                  <td>{appt.timeSlot}</td>
-                  <td>
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() =>
-                        window.open(`https://wa.me/?text=Appointment+Details:+${appt.name}`, "_blank")
-                      }
-                    >
-                      <FaWhatsapp /> Send WhatsApp
-                    </button>
-                  </td>
+        <div>
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped">
+              <thead className="thead-dark">
+                <tr>
+                  <th>Sl. No.</th>
+                  <th>Patient Name</th>
+                  <th>Phone No</th>
+                  <th>Doctor</th>
+                  <th>Department</th>
+                  <th>Date</th>
+                  <th>Time Slot</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginatedAppointments.map((appt, index) => (
+                  <tr key={appt.id}>
+                    <td>{index + 1}</td>
+                    <td>{appt.name}</td>
+                    <td>{appt.phone}</td>
+                    <td>{appt.doctor}</td>
+                    <td>{appt.department}</td>
+                    <td>{appt.date}</td>
+                    <td>{appt.timeSlot}</td>
+                    <td>
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => window.open(`https://wa.me/${appt.phone}`)}
+                      >
+                        <FaWhatsapp />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Pagination */}
+          <div className="pagination-container">
+            <button
+              onClick={() => changePage(1)}
+              disabled={currentPage === 1}
+              className="btn btn-outline-primary btn-sm"
+            >
+              First
+            </button>
+            <button
+              onClick={() => changePage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="btn btn-outline-primary btn-sm"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => changePage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="btn btn-outline-primary btn-sm"
+            >
+              Next
+            </button>
+            <button
+              onClick={() => changePage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="btn btn-outline-primary btn-sm"
+            >
+              Last
+            </button>
+          </div>
         </div>
       )}
     </div>

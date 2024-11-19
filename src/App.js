@@ -17,7 +17,7 @@ function App() {
         <Navbar />
         
         {/* Main Content */}
-        <main style={{ padding: '0px',backgroundColor:'#f8f8f8'}}>
+        <main>
           <Routes>
             {/* Define Routes for each page */}
             <Route path="/" element={<Home />} />  {/* Home page */}
