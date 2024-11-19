@@ -81,7 +81,15 @@
 }
 
 
-
+.css-1hd3wng-MuiTypography-root {
+  margin: 0;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  letter-spacing:3px!important;
+  margin-bottom: 16px;
+}
 
 
 /* Responsive Design */
@@ -111,6 +119,15 @@
     padding: 5px!important;
     margin: 20px 0;
     box-shadow: none!important;
+}
+.css-1hd3wng-MuiTypography-root {
+  margin: 0;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  letter-spacing:3px!important;
+  margin-bottom: 16px;
 }
   
 }

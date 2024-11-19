@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, get } from "firebase/database";
 import { initializeApp } from "firebase/app";
-import { FaFilter, FaWhatsapp, FaDownload } from "react-icons/fa"; // Import icons
-import { jsPDF } from "jspdf"; // Import jsPDF
-import "jspdf-autotable"; // Import jsPDF autotable plugin
-import * as XLSX from "xlsx"; // Import XLSX for Excel export
+import { FaFilter, FaWhatsapp, FaDownload } from "react-icons/fa";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import * as XLSX from "xlsx";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -30,6 +30,8 @@ function AppointmentTable() {
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,6 +92,12 @@ function AppointmentTable() {
     if (selectedTimeSlot) {
       filtered = filtered.filter((appt) => appt.timeSlot === selectedTimeSlot);
     }
+    if (startDate) {
+      filtered = filtered.filter((appt) => new Date(appt.date) >= new Date(startDate));
+    }
+    if (endDate) {
+      filtered = filtered.filter((appt) => new Date(appt.date) <= new Date(endDate));
+    }
     setFilteredAppointments(filtered);
     setCurrentPage(1); // Reset to first page
   };
@@ -129,6 +137,14 @@ function AppointmentTable() {
     XLSX.writeFile(wb, `appointments_${new Date().toISOString()}.xlsx`);
   };
 
+  // Send confirmation message on WhatsApp
+  const sendWhatsappConfirmation = (phone, name, doctor, date, timeSlot) => {
+    const message = `Dear ${name}, your appointment has been scheduled with Dr. ${doctor} on ${date}. Please report between ${timeSlot}.`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -151,7 +167,7 @@ function AppointmentTable() {
       {/* Filter and Export Buttons */}
       <div className="mb-3">
         <button className="btn btn-primary me-3" onClick={exportToExcel}>
-          <FaFilter /> Export to Excel
+          <FaDownload /> Export to Excel
         </button>
         <button className="btn btn-success" onClick={exportToPDF}>
           <FaDownload /> Export to PDF
@@ -160,9 +176,28 @@ function AppointmentTable() {
 
       {/* Filter Dropdowns */}
       <div className="row mb-4">
+        {/* Date Range */}
+        <div className="col-md-3">
+          <label>Start Date</label>
+          <input
+            type="date"
+            className="form-control"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+        <div className="col-md-3">
+          <label>End Date</label>
+          <input
+            type="date"
+            className="form-control"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
         {/* Department */}
-        <div className="col-md-4 my-1">
-          <label className="my-1">Department</label>
+        <div className="col-md-3">
+          <label>Department</label>
           <select
             className="form-control"
             value={selectedDepartment}
@@ -177,44 +212,26 @@ function AppointmentTable() {
           </select>
         </div>
         {/* Doctor */}
-        <div className="col-md-3 my-1">
-          <label className="my-1">Doctor</label>
+        <div className="col-md-3">
+          <label>Doctor</label>
           <select
             className="form-control"
             value={selectedDoctor}
             onChange={(e) => handleDoctorChange(e.target.value)}
-            disabled={!selectedDepartment}
+            disabled={!selectedDepartment} // Disable if no department selected
           >
             <option value="">Select Doctor</option>
-            {doctors.map((doc, index) => (
-              <option key={index} value={doc}>
-                {doc}
+            {doctors.map((doctor, index) => (
+              <option key={index} value={doctor}>
+                {doctor}
               </option>
             ))}
           </select>
         </div>
-        {/* Time Slot */}
-        <div className="col-md-3 my-1">
-          <label className="my-1">Time Slot</label>
-          <select
-            className="form-control"
-            value={selectedTimeSlot}
-            onChange={(e) => setSelectedTimeSlot(e.target.value)}
-            disabled={!selectedDoctor}
-          >
-            <option value="">Select Time Slot</option>
-            {timeSlots.map((slot, index) => (
-              <option key={index} value={slot}>
-                {slot}
-              </option>
-            ))}
-          </select>
-        </div>
-         {/* Time Slot */}
-         <div className="col-md-2">
-         <button className="btn btn-primary me-3 " onClick={applyFilters}>
-          <FaFilter /> Apply Filters
-        </button>
+        <div className="col-md-2">
+          <button className="btn btn-primary mt-4" onClick={applyFilters}>
+            Apply Filters
+          </button>
         </div>
       </div>
 
@@ -226,23 +243,23 @@ function AppointmentTable() {
       ) : (
         <div>
           <div className="table-responsive">
-            <table className="table table-bordered table-striped">
-              <thead className="thead-dark">
+            <table className="table table-bordered">
+              <thead>
                 <tr>
                   <th>Sl. No.</th>
                   <th>Patient Name</th>
-                  <th>Phone No</th>
+                  <th>Phone</th>
                   <th>Doctor</th>
                   <th>Department</th>
                   <th>Date</th>
                   <th>Time Slot</th>
-                  <th>Actions</th>
+                  <th>WhatsApp</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedAppointments.map((appt, index) => (
                   <tr key={appt.id}>
-                    <td>{index + 1}</td>
+                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td>{appt.name}</td>
                     <td>{appt.phone}</td>
                     <td>{appt.doctor}</td>
@@ -250,49 +267,56 @@ function AppointmentTable() {
                     <td>{appt.date}</td>
                     <td>{appt.timeSlot}</td>
                     <td>
-                      <button
-                        className="btn btn-success btn-sm"
-                        onClick={() => window.open(`https://wa.me/${appt.phone}`)}
+                      <a className="btn btn-success"
+                        href={`https://wa.me/${appt.phone}?text=Dear%20${appt.name}%2C%20Your%20appointment%20has%20been%20scheduled%20with%20Dr.%20${appt.doctor}%20on%20${appt.date}%20between%20${appt.timeSlot}.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        <FaWhatsapp />
-                      </button>
+                        <FaWhatsapp /> Send Confirmation Message
+                      </a>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
           {/* Pagination */}
-          <div className="pagination-container">
-            <button
-              onClick={() => changePage(1)}
-              disabled={currentPage === 1}
-              className="btn btn-outline-primary btn-sm"
-            >
-              First
-            </button>
-            <button
-              onClick={() => changePage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="btn btn-outline-primary btn-sm"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => changePage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="btn btn-outline-primary btn-sm"
-            >
-              Next
-            </button>
-            <button
-              onClick={() => changePage(totalPages)}
-              disabled={currentPage === totalPages}
-              className="btn btn-outline-primary btn-sm"
-            >
-              Last
-            </button>
-          </div>
+          <nav>
+            <ul className="pagination justify-content-center">
+              <li className="page-item">
+                <button
+                  className="page-link"
+                  onClick={() => changePage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+              </li>
+              {[...Array(totalPages)].map((_, index) => (
+                <li
+                  key={index}
+                  className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => changePage(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+              <li className="page-item">
+                <button
+                  className="page-link"
+                  onClick={() => changePage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>  
         </div>
       )}
     </div>

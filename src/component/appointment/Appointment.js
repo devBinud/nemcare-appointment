@@ -268,7 +268,7 @@ const Appointment = () => {
       >
         <DialogTitle>Success!</DialogTitle>
         <DialogContent>
-          <Typography>Your appointment has been successfully submitted.</Typography>
+          <Typography>Thank you for appointment booking. You will get a Confirmation message on your registered whatsapp No</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsSuccessModalOpen(false)} color="primary">
