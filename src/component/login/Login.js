@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import AppointmentTable from '../appointment/AppointmentTable';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from './firebaseConfig'; // Your Firebase config file
 import {
   Box,
   Typography,
@@ -7,38 +9,29 @@ import {
   Button,
   IconButton,
   InputAdornment,
-  Container,
   Card,
   CardContent,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-function Dashboard() {
-  return (
-    <Box>
-      <AppointmentTable />
-    </Box>
-  );
-}
-
 function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'nemcare@2024') {
-      setIsLoggedIn(true);
-    } else {
-      alert('Invalid username or password');
+    try {
+      // Firebase Authentication to log in the user
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/appointments'); // Redirect to the dashboard or desired route
+    } catch (err) {
+      setError('Invalid email or password. Please try again.');
     }
   };
-
-  if (isLoggedIn) {
-    return <Dashboard />;
-  }
 
   return (
     <Box
@@ -47,7 +40,6 @@ function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        // background: 'linear-gradient(135deg, #6b73ff 0%, #000dff 100%)',
       }}
     >
       <Card
@@ -81,11 +73,11 @@ function Login() {
             sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
           >
             <TextField
-              label="Username"
+              label="Email"
               variant="outlined"
               fullWidth
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               InputProps={{
                 sx: {
                   borderRadius: 2,
@@ -115,6 +107,11 @@ function Login() {
                 },
               }}
             />
+            {error && (
+              <Typography variant="body2" sx={{ color: 'red', textAlign: 'center' }}>
+                {error}
+              </Typography>
+            )}
             <Button
               type="submit"
               fullWidth
