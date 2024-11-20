@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '../../firebaseConfig'; // Import your firebase config
-import { Button } from '@mui/material'; // Import Button from Material-UI
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../../firebaseConfig"; // Import your firebase config
+import { Button } from "@mui/material"; // Import Button from Material-UI
 import "./Navbar.css";
+import { FaSignInAlt } from "react-icons/fa"; // Admin login icon
 import logo from "../../assets/logo/logo.jpg";
 
 function Navbar() {
@@ -29,7 +30,7 @@ function Navbar() {
     try {
       await signOut(auth); // Firebase logout
       setIsLoggedIn(false); // Update login state
-      navigate('/login'); // Redirect to login page
+      navigate("/login"); // Redirect to login page
     } catch (error) {
       console.error("Logout error", error);
     }
@@ -43,12 +44,12 @@ function Navbar() {
             {isLoggedIn ? (
               <img src={logo} alt="Logo" className="navbar-logo" />
             ) : (
-              'Nemcare' // Optionally replace this with text or an icon when logged out
+              "Nemcare" // Optionally replace this with text or an icon when logged out
             )}
           </Link>
 
           {/* Conditionally render the navbar toggler only if user is not logged in or not on /home */}
-          {!(isLoggedIn && location.pathname === '/') && (
+          {!(isLoggedIn && location.pathname === "/") && (
             <button
               className="navbar-toggler"
               type="button"
@@ -67,22 +68,38 @@ function Navbar() {
               {/* Add any other navbar items here */}
             </ul>
             <form className="d-flex">
-              {/* Render Admin Login button only when the user is not logged in and not on /login route */}
-              {location.pathname !== '/login' && location.pathname !== '/home' && !isLoggedIn ? (
-                <Link to="/login" className="adminLogin__button" type="submit">
+              {/* Render Admin Login button only when the user is not logged in and not on /login or /home route */}
+              {location.pathname !== "/login" &&
+              location.pathname !== "/home" &&
+              !isLoggedIn ? (
+                <Button
+                  component={Link} // Use Link to navigate
+                  to="/login"
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<FaSignInAlt />} // Icon for the login button
+                  sx={{
+                    padding: "8px 16px",
+                    fontSize: "16px",
+                    textTransform: "none",
+                    borderRadius: 3,
+                  }}
+                >
                   Admin Login
-                </Link>
+                </Button>
               ) : (
                 // Render Logout button only on the /appointments route when logged in
-                isLoggedIn && location.pathname === '/appointments' && (
+                isLoggedIn &&
+                location.pathname === "/appointments" && (
                   <Button
                     onClick={handleLogout}
                     variant="contained"
-                    color="secondary"
+                    color="danger"
+                    startIcon={<FaSignInAlt />} // Icon for the login button
                     sx={{
-                      padding: '8px 16px',
-                      fontSize: '16px',
-                      textTransform: 'none',
+                      padding: "8px 16px",
+                      fontSize: "13px",
+                      textTransform: "none",
                       borderRadius: 3,
                     }}
                   >

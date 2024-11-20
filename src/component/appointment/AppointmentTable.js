@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, get } from "firebase/database";
 import { initializeApp } from "firebase/app";
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { FaFilter, FaWhatsapp, FaDownload } from "react-icons/fa";
+import TextField from "@mui/material/TextField";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import { Button } from "@mui/material";
 import * as XLSX from "xlsx";
 import "./AppointmentTable.css"; // Optional: Add your custom CSS for further styling
 
@@ -38,7 +41,14 @@ function AppointmentTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-   console.log(doctors,setDoctors,timeSlots,setTimeSlots,setSelectedDoctor,setSelectedTimeSlot);
+  console.log(
+    doctors,
+    setDoctors,
+    timeSlots,
+    setTimeSlots,
+    setSelectedDoctor,
+    setSelectedTimeSlot
+  );
 
   // Fetch appointments from Firebase
   const fetchAppointments = async () => {
@@ -57,7 +67,9 @@ function AppointmentTable() {
         setAppointments(appointmentsList);
         setFilteredAppointments(appointmentsList);
 
-        const departmentsList = [...new Set(appointmentsList.map((appt) => appt.department))];
+        const departmentsList = [
+          ...new Set(appointmentsList.map((appt) => appt.department)),
+        ];
         setDepartments(departmentsList);
       } else {
         console.warn("No appointments found in the database.");
@@ -78,7 +90,9 @@ function AppointmentTable() {
     let filtered = appointments;
 
     if (selectedDepartment) {
-      filtered = filtered.filter((appt) => appt.department === selectedDepartment);
+      filtered = filtered.filter(
+        (appt) => appt.department === selectedDepartment
+      );
     }
     if (selectedDoctor) {
       filtered = filtered.filter((appt) => appt.doctor === selectedDoctor);
@@ -87,10 +101,14 @@ function AppointmentTable() {
       filtered = filtered.filter((appt) => appt.timeSlot === selectedTimeSlot);
     }
     if (startDate) {
-      filtered = filtered.filter((appt) => new Date(appt.date) >= new Date(startDate));
+      filtered = filtered.filter(
+        (appt) => new Date(appt.date) >= new Date(startDate)
+      );
     }
     if (endDate) {
-      filtered = filtered.filter((appt) => new Date(appt.date) <= new Date(endDate));
+      filtered = filtered.filter(
+        (appt) => new Date(appt.date) <= new Date(endDate)
+      );
     }
     setFilteredAppointments(filtered);
     setCurrentPage(1); // Reset to first page
@@ -101,7 +119,16 @@ function AppointmentTable() {
     const doc = new jsPDF();
     doc.text("Filtered Appointments", 10, 10);
     doc.autoTable({
-      head: [["Sl. No.", "Patient Name", "Doctor", "Department", "Date", "Time Slot"]],
+      head: [
+        [
+          "Sl. No.",
+          "Patient Name",
+          "Doctor",
+          "Department",
+          "Date",
+          "Time Slot",
+        ],
+      ],
       body: filteredAppointments.map((appt, index) => [
         index + 1,
         appt.name,
@@ -120,9 +147,9 @@ function AppointmentTable() {
       filteredAppointments.map((appt, index) => ({
         "Sl. No.": index + 1,
         "Patient Name": appt.name,
-        "Doctor": appt.doctor,
-        "Department": appt.department,
-        "Date": appt.date,
+        Doctor: appt.doctor,
+        Department: appt.department,
+        Date: appt.date,
         "Time Slot": appt.timeSlot,
       }))
     );
@@ -146,57 +173,102 @@ function AppointmentTable() {
 
   return (
     <div className="container py-3">
-      <h3 className="mb-4">Appointments</h3>
+      <h3 className="mb-4" style={{ letterSpacing: 0.3, fontSize: "17px" }}>
+        All Appointments
+      </h3>
 
       {/* Export Buttons */}
       <div className="mb-3">
-        <button className="btn btn-primary me-2" onClick={exportToPDF}>
-          <FaDownload /> Export to PDF
-        </button>
-        <button className="btn btn-success" onClick={exportToExcel}>
-          <FaDownload /> Export to Excel
-        </button>
+        <div className="row">
+          <div className="col-md-6">
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<FaDownload />}
+              onClick={exportToPDF}
+              className="me-2"
+            >
+              Export to PDF
+            </Button>
+          </div>
+          <div className="col-md-6 mt-3 mt-lg-0">
+            <Button
+              variant="contained"
+              color="warning"
+              startIcon={<FaDownload />}
+              onClick={exportToExcel}
+            >
+              Export to Excel
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
       <div className="row mb-4">
         <div className="col-md-3 my-1">
-          <label className="my-1">Start Date</label>
-          <input
+          <TextField
+            id="date"
+            label="Start Date"
             type="date"
-            className="form-control"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            fullWidth
+            margin="normal"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
+            required
           />
         </div>
         <div className="col-md-3 my-1">
-          <label className="my-1">End Date</label>
-          <input
+          <TextField
+            id="date"
+            label="End Date"
             type="date"
-            className="form-control"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            fullWidth
+            margin="normal"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
+            required
           />
         </div>
         <div className="col-md-3 my-1">
-          <label className="my-1">Department</label>
-          <select
-            className="form-control"
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-          >
-            <option value="">Select Department</option>
-            {departments.map((dept, index) => (
-              <option key={index} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
+          <FormControl fullWidth margin="normal" required>
+            <InputLabel id="department-label">Department</InputLabel>
+            <Select
+              labelId="department-label"
+              id="department"
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              label="Department"
+            >
+              <MenuItem value="">
+                <em>Select Department</em>
+              </MenuItem>
+              {departments.map((dept, index) => (
+                <MenuItem key={index} value={dept}>
+                  {dept}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
-        <div className="col-md-3 d-flex align-items-end">
-          <button className="btn btn-primary mb-2" onClick={applyFilters}>
-            <FaFilter /> Apply Filters
-          </button>
+
+        {/* Apply Filters Button */}
+        <div className="col-md-3 d-flex align-items-end mt-2 mt-lg-0">
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<FaFilter />}
+            onClick={applyFilters}
+            className="mb-2 mb-lg-4 py-0 py-lg-2 w-100 w-lg-none"
+          >
+            Apply Filters
+          </Button>
         </div>
       </div>
 
@@ -233,11 +305,11 @@ function AppointmentTable() {
                   <td>
                     <a
                       className="btn btn-success"
-                      href={`https://wa.me/${appt.phone}?text=Dear%20${appt.name}%2C%20Your%20appointment%20is%20confirmed%20with%20Dr.%20${appt.doctor}%20on%20${appt.date}%20at%20${appt.timeSlot}.`}
+                      href={`https://wa.me/+91${appt.phone}?text=Dear%20${appt.name}%2C%20Your%20appointment%20is%20confirmed%20with%20Dr.%20${appt.doctor}%20on%20${appt.date}%20at%20${appt.timeSlot}.`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <FaWhatsapp />
+                      <FaWhatsapp /> Send Confirmation
                     </a>
                   </td>
                 </tr>
@@ -251,19 +323,32 @@ function AppointmentTable() {
       <nav>
         <ul className="pagination justify-content-center">
           <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-            <button className="page-link" onClick={() => changePage(currentPage - 1)}>
+            <button
+              className="page-link"
+              onClick={() => changePage(currentPage - 1)}
+            >
               Previous
             </button>
           </li>
           {[...Array(totalPages)].map((_, i) => (
-            <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+            <li
+              key={i}
+              className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
+            >
               <button className="page-link" onClick={() => changePage(i + 1)}>
                 {i + 1}
               </button>
             </li>
           ))}
-          <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-            <button className="page-link" onClick={() => changePage(currentPage + 1)}>
+          <li
+            className={`page-item ${
+              currentPage === totalPages ? "disabled" : ""
+            }`}
+          >
+            <button
+              className="page-link"
+              onClick={() => changePage(currentPage + 1)}
+            >
               Next
             </button>
           </li>
