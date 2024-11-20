@@ -265,7 +265,7 @@ function AppointmentTable() {
             color="success"
             startIcon={<FaFilter />}
             onClick={applyFilters}
-            className="mb-2 mb-lg-4 py-0 py-lg-2 w-100 w-lg-none"
+            className="mb-2 mb-lg-4 py-2 py-lg-2 w-100 w-lg-none"
           >
             Apply Filters
           </Button>
