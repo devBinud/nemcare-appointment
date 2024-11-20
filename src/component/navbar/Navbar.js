@@ -44,7 +44,7 @@ function Navbar() {
             {isLoggedIn ? (
               <img src={logo} alt="Logo" className="navbar-logo" />
             ) : (
-              "Nemcare" // Optionally replace this with text or an icon when logged out
+              <img src={logo} alt="Logo" className="navbar-logo" />
             )}
           </Link>
 

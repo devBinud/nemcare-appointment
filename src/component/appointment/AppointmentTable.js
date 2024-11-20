@@ -8,6 +8,15 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { Button } from "@mui/material";
 import * as XLSX from "xlsx";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import "./AppointmentTable.css"; // Optional: Add your custom CSS for further styling
 
 // Firebase configuration
@@ -279,43 +288,76 @@ function AppointmentTable() {
         <p>No appointments found</p>
       ) : (
         <div className="table-responsive">
-          <table className="table table-bordered">
-            <thead>
-              <tr>
-                <th>Sl. No.</th>
-                <th>Patient Name</th>
-                <th>Phone</th>
-                <th>Doctor</th>
-                <th>Department</th>
-                <th>Date</th>
-                <th>Time Slot</th>
-                <th>WhatsApp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedAppointments.map((appt, index) => (
-                <tr key={appt.id}>
-                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                  <td>{appt.name}</td>
-                  <td>{appt.phone}</td>
-                  <td>{appt.doctor}</td>
-                  <td>{appt.department}</td>
-                  <td>{appt.date}</td>
-                  <td>{appt.timeSlot}</td>
-                  <td>
-                    <a
-                      className="btn btn-success"
-                      href={`https://wa.me/+91${appt.phone}?text=Dear%20${appt.name}%2C%20Your%20appointment%20is%20confirmed%20with%20Dr.%20${appt.doctor}%20on%20${appt.date}%20at%20${appt.timeSlot}.`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <FaWhatsapp /> Send Confirmation
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <TableContainer
+            component={Paper}
+            sx={{ boxShadow: 3, borderRadius: 2 }}
+          >
+            <Table className="table table-bordered" sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    Sl. No.
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    Patient Name
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    Phone
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    Doctor
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    Department
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    Date
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    Time Slot
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    WhatsApp
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedAppointments.map((appt, index) => (
+                  <TableRow key={appt.id} hover>
+                    <TableCell align="center">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
+                    <TableCell align="center">{appt.name}</TableCell>
+                    <TableCell align="center">{appt.phone}</TableCell>
+                    <TableCell align="center">{appt.doctor}</TableCell>
+                    <TableCell align="center">{appt.department}</TableCell>
+                    <TableCell align="center">{appt.date}</TableCell>
+                    <TableCell align="center">{appt.timeSlot}</TableCell>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        color="success"
+                        startIcon={<FaWhatsapp />}
+                        href={`https://wa.me/+91${appt.phone}?text=Dear%20*${appt.name}*%2C%20Your%20appointment%20is%20confirmed%20with%20*${appt.doctor}*%20on%20${appt.date}%20at%20${appt.timeSlot}.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                          textTransform: "none",
+                          fontWeight: "bold",
+                          "&:hover": {
+                            backgroundColor: "white", // Maintains the same color as the base
+                            boxShadow: "none", // Optional: Removes any hover shadow effect
+                          },
+                        }}
+                      >
+                        Send Confirmation
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
       )}
 

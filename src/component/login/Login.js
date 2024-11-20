@@ -75,6 +75,7 @@ function Login() {
             <TextField
               label="Email"
               variant="outlined"
+            
               fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -87,6 +88,7 @@ function Login() {
             <TextField
               label="Password"
               variant="outlined"
+              className="mt-1 mt-lg-0"
               fullWidth
               type={showPassword ? 'text' : 'password'}
               value={password}

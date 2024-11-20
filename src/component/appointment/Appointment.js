@@ -245,6 +245,8 @@ const Appointment = () => {
               type="submit"
               variant="contained"
               color="primary"
+              className="py-2"
+              style={{letterSpacing:3.4}}
               fullWidth
               sx={{ marginTop: 3 }}
               disabled={isSubmitting}
