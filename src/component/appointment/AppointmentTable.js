@@ -38,6 +38,8 @@ function AppointmentTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+   console.log(doctors,setDoctors,timeSlots,setTimeSlots,setSelectedDoctor,setSelectedTimeSlot);
+
   // Fetch appointments from Firebase
   const fetchAppointments = async () => {
     try {
