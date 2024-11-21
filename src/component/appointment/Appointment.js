@@ -5,7 +5,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -13,7 +12,7 @@ import Fade from "@mui/material/Fade";
 import sendAppointmentData from "./firebase"; // Import the function to send data
 import "./Appointment.css"; // Import the CSS file
 import doctorsAPI from "./doctorsAPI"; // Import the doctors and schedule data
-import doctorImage from "../../assets/1.jpg"
+import doctorImage from "../../assets/1.jpg";
 
 const Appointment = () => {
   const [name, setName] = useState("");
@@ -143,16 +142,6 @@ const Appointment = () => {
               required
             />
             <TextField
-              id="email"
-              label="Email (optional)"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
               id="department"
               select
               label="Department"
@@ -203,7 +192,11 @@ const Appointment = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
+              inputProps={{
+                min: new Date().toISOString().split("T")[0], // Set the minimum date to today's date
+              }}
             />
+
             {doctor && (
               <Box mt={2}>
                 <Typography variant="body2" mb={1}>
@@ -227,14 +220,18 @@ const Appointment = () => {
               </Typography>
               <div>
                 <Button
-                  variant={isWhatsappAvailable === "yes" ? "contained" : "outlined"}
+                  variant={
+                    isWhatsappAvailable === "yes" ? "contained" : "outlined"
+                  }
                   sx={{ marginRight: "10px" }}
                   onClick={() => setIsWhatsappAvailable("yes")}
                 >
                   Yes
                 </Button>
                 <Button
-                  variant={isWhatsappAvailable === "no" ? "contained" : "outlined"}
+                  variant={
+                    isWhatsappAvailable === "no" ? "contained" : "outlined"
+                  }
                   onClick={() => setIsWhatsappAvailable("no")}
                 >
                   No
@@ -246,7 +243,7 @@ const Appointment = () => {
               variant="contained"
               color="primary"
               className="py-2"
-              style={{letterSpacing:3.4}}
+              style={{ letterSpacing: 3.4 }}
               fullWidth
               sx={{ marginTop: 3 }}
               disabled={isSubmitting}
@@ -268,9 +265,11 @@ const Appointment = () => {
         TransitionComponent={Fade}
         transitionDuration={{ enter: 500, exit: 300 }}
       >
-        <DialogTitle>Success!</DialogTitle>
         <DialogContent>
-          <Typography>Thank you for appointment booking. You will get a Confirmation message on your registered whatsapp No</Typography>
+          <Typography>
+            Thank you for appointment booking. You will get a Confirmation
+            message on your registered whatsapp No
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsSuccessModalOpen(false)} color="primary">

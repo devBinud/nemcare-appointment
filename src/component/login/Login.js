@@ -88,7 +88,7 @@ function Login() {
             <TextField
               label="Password"
               variant="outlined"
-              className="mt-1 mt-lg-0"
+              className="mt-2 mt-lg-0"
               fullWidth
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -117,6 +117,7 @@ function Login() {
             <Button
               type="submit"
               fullWidth
+              className='mt-2 mt-lg-0'
               variant="contained"
               sx={{
                 bgcolor: 'primary.main',
