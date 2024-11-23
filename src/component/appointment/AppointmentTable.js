@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import "./AppointmentTable.css"; // Optional: Add your custom CSS for further styling
 
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAXbYmqrI0b-qM3DnpOgX2Doai52L60kqk",
